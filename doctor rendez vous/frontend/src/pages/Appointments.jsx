@@ -5,6 +5,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
+import interactionPlugin from "@fullcalendar/interaction";
 import momentTimezonePlugin from "@fullcalendar/moment-timezone";
 import momentPlugin from "@fullcalendar/moment";
 import axios from "axios";
@@ -29,11 +30,14 @@ const Appointments = () => {
   const getAllAppoint = useCallback(async () => {
     try {
       dispatch(setLoading(true));
-      const response = await axios.get(`/appointment/getallappointments?search=${userId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const response = await axios.get(
+        `/appointment/getallappointments?search=${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       setAppointments(response.data);
       dispatch(setLoading(false));
     } catch (error) {
@@ -94,7 +98,9 @@ const Appointments = () => {
 
   const cancelAppointment = async (appointmentId) => {
     try {
-      const confirm = window.confirm("Are you sure you want to cancel this appointment?");
+      const confirm = window.confirm(
+        "Are you sure you want to cancel this appointment?"
+      );
       if (confirm) {
         const config = {
           headers: {
@@ -119,15 +125,68 @@ const Appointments = () => {
 
   const calendarEvents = appointments.map((appointment) => ({
     id: appointment._id,
-    title: `${appointment.userId.firstname} ${appointment.userId.lastname} - ${appointment.time}`,
-    start: appointment.date,
+    title: `${appointment.userId.firstname} ${appointment.userId.lastname}`,
+    start: `${appointment.date}T${appointment.time}`,
+    end: `${appointment.date}T${parseInt(appointment.time.split(":")[0]) + 1}:${
+      appointment.time.split(":")[1]
+    }`,
+    className: `status-${appointment.status.toLowerCase()}`,
     extendedProps: {
       status: appointment.status,
       age: appointment.age,
       gender: appointment.gender,
       number: appointment.number,
+      patientName: `${appointment.userId.firstname} ${appointment.userId.lastname}`,
     },
   }));
+
+  const handleEventClick = (info) => {
+    const event = info.event;
+    const props = event.extendedProps;
+
+    toast(
+      (t) => (
+        <div className="event-tooltip">
+          <h3>Détails du rendez-vous</h3>
+          <p>
+            <strong>Patient:</strong> {props.patientName}
+          </p>
+          <p>
+            <strong>Statut:</strong> {props.status}
+          </p>
+          <p>
+            <strong>Date:</strong> {event.start.toLocaleDateString()}
+          </p>
+          <p>
+            <strong>Heure:</strong>{" "}
+            {event.start.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </p>
+          <p>
+            <strong>Âge:</strong> {props.age}
+          </p>
+          <p>
+            <strong>Genre:</strong> {props.gender}
+          </p>
+          <p>
+            <strong>Téléphone:</strong> {props.number}
+          </p>
+        </div>
+      ),
+      {
+        duration: 5000,
+        style: {
+          background: "#fff",
+          color: "#1f2937",
+          padding: "1rem",
+          borderRadius: "8px",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        },
+      }
+    );
+  };
 
   return (
     <>
@@ -140,33 +199,70 @@ const Appointments = () => {
           <div className="appointments-calendar">
             <div className="calendar-section">
               <FullCalendar
-                plugins={[dayGridPlugin, timeGridPlugin, listPlugin, momentTimezonePlugin, momentPlugin]}
+                plugins={[
+                  dayGridPlugin,
+                  timeGridPlugin,
+                  listPlugin,
+                  interactionPlugin,
+                  momentTimezonePlugin,
+                  momentPlugin,
+                ]}
                 initialView="dayGridMonth"
+                headerToolbar={{
+                  left: "prev,next today",
+                  center: "title",
+                  right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
+                }}
+                views={{
+                  timeGridWeek: {
+                    titleFormat: {
+                      year: "numeric",
+                      month: "short",
+                      day: "2-digit",
+                    },
+                  },
+                  timeGridDay: {
+                    titleFormat: {
+                      year: "numeric",
+                      month: "short",
+                      day: "2-digit",
+                    },
+                  },
+                }}
                 events={calendarEvents}
+                eventClick={handleEventClick}
                 eventContent={(arg) => (
-                  <div>
-                    <p>{arg.event.title}</p>
-                    <p>Status: {arg.event.extendedProps.status}</p>
-                    <p>Age: {arg.event.extendedProps.age}</p>
-                    <p>Gender: {arg.event.extendedProps.gender}</p>
-                    <p>Number: {arg.event.extendedProps.number}</p>
+                  <div className="calendar-event">
+                    <div className="event-time">{arg.timeText}</div>
+                    <div className="event-title">{arg.event.title}</div>
+                    <div className="event-status">
+                      {arg.event.extendedProps.status}
+                    </div>
                   </div>
                 )}
+                slotMinTime="08:00:00"
+                slotMaxTime="20:00:00"
+                slotDuration="00:30:00"
+                allDaySlot={false}
+                nowIndicator={true}
+                dayMaxEvents={true}
+                eventMaxStack={3}
+                locale="fr"
               />
             </div>
+
             <div className="table-section">
+              <div className="table-header">
+                <h3 className="table-title">Liste des rendez-vous</h3>
+              </div>
               <table>
                 <thead>
                   <tr>
-                    <th>S.No</th>
-                    <th>Doctor</th>
-                    <th>P Name</th>
-                    <th>P Age</th>
-                    <th>P Gender</th>
-                    <th>P Mobile No.</th>
-                    <th>Appointment Date</th>
-                    <th>Appointment Time</th>
-                    <th>Status</th>
+                    <th>N°</th>
+                    <th>Patient</th>
+                    <th>Date</th>
+                    <th>Heure</th>
+                    <th>Statut</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -174,29 +270,31 @@ const Appointments = () => {
                   {paginatedAppointments.map((appointment, index) => (
                     <tr key={appointment._id}>
                       <td>{(currentPage - 1) * PerPage + index + 1}</td>
-                      <td>{`${appointment.doctorId.firstname} ${appointment.doctorId.lastname}`}</td>
                       <td>{`${appointment.userId.firstname} ${appointment.userId.lastname}`}</td>
-                      <td>{appointment.age}</td>
-                      <td>{appointment.gender}</td>
-                      <td>{appointment.number}</td>
                       <td>{appointment.date}</td>
                       <td>{appointment.time}</td>
-                      <td>{appointment.status}</td>
                       <td>
+                        <span
+                          className={`status-badge status-${appointment.status.toLowerCase()}`}
+                        >
+                          {appointment.status}
+                        </span>
+                      </td>
+                      <td className="actions">
                         <button
-                          className="btn user-btn complete-btn"
+                          className="btn complete-btn"
                           onClick={() => completeAppointment(appointment)}
                           disabled={appointment.status === "Completed"}
                         >
-                          Complete
+                          Terminer
                         </button>
                         {appointment.status !== "Completed" && (
                           <button
-                            className="btn user-btn cancel-btn"
+                            className="btn cancel-btn"
                             onClick={() => cancelAppointment(appointment._id)}
                             disabled={appointment.status === "Cancelled"}
                           >
-                            Cancel
+                            Annuler
                           </button>
                         )}
                       </td>
@@ -204,7 +302,9 @@ const Appointments = () => {
                   ))}
                 </tbody>
               </table>
-              <div className="pagination">{renderPagination()}</div>
+              {totalPages > 1 && (
+                <div className="pagination">{renderPagination()}</div>
+              )}
             </div>
           </div>
         </section>

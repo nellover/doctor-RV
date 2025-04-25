@@ -2,6 +2,12 @@ import "../styles/doctorcard.css";
 import React, { useState } from "react";
 import BookAppointment from "../components/BookAppointment";
 import { toast } from "react-hot-toast";
+import {
+  FaUserMd,
+  FaPhone,
+  FaMoneyBillWave,
+  FaBriefcase,
+} from "react-icons/fa";
 
 const DoctorCard = ({ ele }) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -15,46 +21,67 @@ const DoctorCard = ({ ele }) => {
   };
 
   return (
-    <div className={`card`}>
-      <div className={`card-img flex-center`}>
-        <img
-          src={
-            ele?.userId?.pic ||
-            "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"
-          }
-          alt="profile"
-        />
+    <div className="doctor-card">
+      <div className="doctor-card__header">
+        <div className="doctor-card__avatar">
+          <img
+            src={
+              ele?.userId?.pic ||
+              "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"
+            }
+            alt="profile"
+          />
+        </div>
+        <div className="doctor-card__status">
+          {ele?.status === "approved" ? (
+            <span className="status-badge available">Available</span>
+          ) : (
+            <span className="status-badge unavailable">Unavailable</span>
+          )}
+        </div>
       </div>
-      <h3 className="card-name">
-        Dr. {ele?.userId?.firstname + " " + ele?.userId?.lastname}
-      </h3>
-      <p className="specialization">
-        <strong>Specialization: </strong>
-        {ele?.specialization}
-      </p>
-      <p className="experience">
-        <strong>Experience: </strong>
-        {ele?.experience}yrs
-      </p>
-      <p className="fees">
-        <strong>Fees per consultation: </strong>$ {ele?.fees}
-      </p>
-      <p className="phone">
-        <strong>Phone: </strong>
-        {ele?.userId?.mobile}
-      </p>
-      <button
-        className="btn appointment-btn"
-        onClick={handleModal}
-      >
-        Book Appointment
-      </button>
-      {modalOpen && (
-        <BookAppointment
-          setModalOpen={setModalOpen}
-          ele={ele}
-        />
-      )}
+
+      <div className="doctor-card__content">
+        <h3 className="doctor-card__name">
+          Dr. {ele?.userId?.firstname + " " + ele?.userId?.lastname}
+        </h3>
+
+        <div className="doctor-card__specialty">
+          <span className="specialty-tag">{ele?.specialization}</span>
+        </div>
+
+        <div className="doctor-card__info">
+          <div className="info-item">
+            <FaBriefcase className="info-icon" />
+            <div className="info-text">
+              <span className="info-label">Experience</span>
+              <span className="info-value">{ele?.experience} years</span>
+            </div>
+          </div>
+
+          <div className="info-item">
+            <FaMoneyBillWave className="info-icon" />
+            <div className="info-text">
+              <span className="info-label">Consultation Fee</span>
+              <span className="info-value">${ele?.fees}</span>
+            </div>
+          </div>
+
+          <div className="info-item">
+            <FaPhone className="info-icon" />
+            <div className="info-text">
+              <span className="info-label">Phone</span>
+              <span className="info-value">{ele?.userId?.mobile}</span>
+            </div>
+          </div>
+        </div>
+
+        <button className="book-appointment-btn" onClick={handleModal}>
+          Book Appointment
+        </button>
+      </div>
+
+      {modalOpen && <BookAppointment setModalOpen={setModalOpen} ele={ele} />}
     </div>
   );
 };

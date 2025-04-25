@@ -1,7 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IoMdClose } from "react-icons/io";
+import {
+  FaCalendarAlt,
+  FaClock,
+  FaUser,
+  FaVenusMars,
+  FaPhone,
+} from "react-icons/fa";
 import axios from "axios";
 import toast from "react-hot-toast";
+import "../styles/bookappointment.css";
 
 const BookAppointment = ({ setModalOpen, ele }) => {
   const [formDetails, setFormDetails] = useState({
@@ -11,6 +19,7 @@ const BookAppointment = ({ setModalOpen, ele }) => {
     gender: "",
     number: "",
   });
+  const [bookedSlots, setBookedSlots] = useState([]);
 
   const inputChange = (e) => {
     const { name, value } = e.target;
@@ -18,17 +27,36 @@ const BookAppointment = ({ setModalOpen, ele }) => {
       ...formDetails,
       [name]: value,
     });
+
+    // Si la date change, récupérer les créneaux réservés
+    if (name === "date") {
+      fetchBookedSlots(value);
+    }
+  };
+
+  const fetchBookedSlots = async (selectedDate) => {
+    try {
+      const response = await axios.get("/appointment/getbookedslots", {
+        params: {
+          doctorId: ele?.userId?._id,
+          date: selectedDate,
+        },
+      });
+      setBookedSlots(response.data);
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des créneaux réservés:",
+        error
+      );
+    }
   };
 
   const bookAppointment = async (e) => {
     e.preventDefault();
     try {
-      // Solution : Utilisez une URL absolue ou vérifiez votre configuration axios
-      const API_BASE_URL = "http://localhost:5015"; // Remplacez par votre URL de base
-      
       await toast.promise(
         axios.post(
-          `${API_BASE_URL}/api/appointment/bookappointment`,
+          "/appointment/bookappointment",
           {
             doctorId: ele?.userId?._id,
             date: formDetails.date,
@@ -36,7 +64,6 @@ const BookAppointment = ({ setModalOpen, ele }) => {
             age: formDetails.age,
             gender: formDetails.gender,
             number: formDetails.number,
-            doctorname: `${ele?.userId?.firstname} ${ele?.userId?.lastname}`,
           },
           {
             headers: {
@@ -46,104 +73,178 @@ const BookAppointment = ({ setModalOpen, ele }) => {
         ),
         {
           success: "Rendez-vous réservé avec succès",
-          // error: "Impossible de prendre rendez-vous",
           loading: "Réservation en cours...",
+          error: "Erreur lors de la réservation. Veuillez réessayer.",
         }
       );
       setModalOpen(false);
     } catch (error) {
-      return error;
+      console.error("Erreur de réservation:", error);
     }
   };
 
   const generateTimeOptions = () => {
-    const startHour = 8; // 8h
-    const endHour = 18; // 18h
+    const startHour = 8;
+    const endHour = 18;
     const timeOptions = [];
 
     for (let hour = startHour; hour <= endHour; hour++) {
-      timeOptions.push(`${hour}:00`);
-      if (hour !== endHour) {
-        timeOptions.push(`${hour}:30`);
+      const fullHour = `${hour}:00`;
+      const halfHour = `${hour}:30`;
+
+      if (!bookedSlots.includes(fullHour)) {
+        timeOptions.push(fullHour);
+      }
+
+      if (hour !== endHour && !bookedSlots.includes(halfHour)) {
+        timeOptions.push(halfHour);
       }
     }
 
     return timeOptions;
   };
 
-  const timeOptions = generateTimeOptions();
+  // Réinitialiser le créneau horaire si la date change
+  useEffect(() => {
+    setFormDetails((prev) => ({ ...prev, time: "" }));
+  }, [bookedSlots]);
 
   return (
-    <div className="modal flex-center">
-      <div className="modal__content">
-        <h2 className="page-heading">Book Appointment</h2>
-        <IoMdClose
-          onClick={() => {
-            setModalOpen(false);
-          }}
-          className="close-btn"
-        />
-        <div className="register-container flex-center book">
-          <form className="register-form">
-            <input
-              type="date"
-              name="date"
-              className="form-input"
-              value={formDetails.date}
-              onChange={inputChange}
-            />
-            <select
-              name="time"
-              className="form-input"
-              value={formDetails.time}
-              onChange={inputChange}
-            >
-              <option value="">Select Time</option>
-              {timeOptions.map((time) => (
-                <option key={time} value={time}>
-                  {time}
-                </option>
-              ))}
-            </select>
-            <input
-              type="number"
-              name="age"
-              placeholder="Age"
-              className="form-input"
-              value={formDetails.age}
-              onChange={inputChange}
-              required
-            />
-            <select
-              name="gender"
-              className="form-input"
-              value={formDetails.gender}
-              onChange={inputChange}
-              required
-            >
-              <option value="">Select Gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
-            <input
-              type="number"
-              name="number"
-              placeholder="Mobile Number"
-              className="form-input"
-              value={formDetails.number}
-              onChange={inputChange}
-              required
-            />
-            <button
-              type="submit"
-              className="btn form-btn"
-              onClick={bookAppointment}
-            >
-              book
-            </button>
-          </form>
+    <div className="modal-overlay">
+      <div className="appointment-modal">
+        <div className="modal-header">
+          <h2>Book Appointment</h2>
+          <button className="close-btn" onClick={() => setModalOpen(false)}>
+            <IoMdClose />
+          </button>
         </div>
+
+        <div className="doctor-info">
+          <img
+            src={
+              ele?.userId?.pic ||
+              "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"
+            }
+            alt="Doctor"
+          />
+          <div>
+            <h3>
+              Dr. {ele?.userId?.firstname} {ele?.userId?.lastname}
+            </h3>
+            <p>{ele?.specialization}</p>
+            <p className="consultation-fee">Consultation Fee: ${ele?.fees}</p>
+          </div>
+        </div>
+
+        <form className="appointment-form" onSubmit={bookAppointment}>
+          <div className="form-grid">
+            <div className="form-group">
+              <label>
+                <FaCalendarAlt className="input-icon" />
+                Date
+              </label>
+              <input
+                type="date"
+                name="date"
+                value={formDetails.date}
+                onChange={inputChange}
+                min={new Date().toISOString().split("T")[0]}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>
+                <FaClock className="input-icon" />
+                Time
+              </label>
+              <select
+                name="time"
+                value={formDetails.time}
+                onChange={inputChange}
+                required
+                disabled={!formDetails.date}
+              >
+                <option value="">Select Time</option>
+                {generateTimeOptions().map((time) => (
+                  <option key={time} value={time}>
+                    {time}
+                  </option>
+                ))}
+              </select>
+              {formDetails.date && generateTimeOptions().length === 0 && (
+                <p className="no-slots-message">
+                  No available time slots for this date
+                </p>
+              )}
+            </div>
+
+            <div className="form-group">
+              <label>
+                <FaUser className="input-icon" />
+                Age
+              </label>
+              <input
+                type="number"
+                name="age"
+                placeholder="Enter your age"
+                value={formDetails.age}
+                onChange={inputChange}
+                min="0"
+                max="150"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>
+                <FaVenusMars className="input-icon" />
+                Gender
+              </label>
+              <select
+                name="gender"
+                value={formDetails.gender}
+                onChange={inputChange}
+                required
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div className="form-group full-width">
+              <label>
+                <FaPhone className="input-icon" />
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                name="number"
+                placeholder="Enter your phone number"
+                value={formDetails.number}
+                onChange={inputChange}
+                pattern="[0-9]{8,}"
+                title="Please enter a valid phone number (minimum 8 digits)"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="form-footer">
+            <button
+              type="button"
+              className="cancel-btn"
+              onClick={() => setModalOpen(false)}
+            >
+              Cancel
+            </button>
+            <button type="submit" className="confirm-btn">
+              Confirm Booking
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

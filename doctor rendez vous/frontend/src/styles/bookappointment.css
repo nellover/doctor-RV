@@ -1,46 +1,214 @@
 @import url(app.css);
 
-.modal {
-  position: absolute;
-  top: 0%;
-  left: 0%;
-  width: 100%;
-  height: 130vh;
-  /* background-color: rgba(0, 0, 0, 0.322); */
-  z-index: 2;
-}
-
-.modal__content {
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2rem;
-  width: 30%;
-  padding: 2rem;
-  border: 1px solid var(--light-blue);
-  border-radius: 10px;
-  color: var(--light-blue);
-  background-color: rgb(30, 55, 90);
-  position: relative;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
 }
 
-.modal__content h2 {
-  color: var(--light-blue);
+.appointment-modal {
+  background: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-.modal__content .btn {
-  font-size: 0.9rem;
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h2 {
+  color: #1f2937;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
 }
 
 .close-btn {
-  position: absolute;
-  top: 2%;
-  right: 2%;
-  font-size: 1.5rem;
-  color: var(--secondary-color);
+  background: transparent;
+  border: none;
+  color: #6b7280;
   cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
 }
 
-.book {
-  width: 80%;
+.close-btn:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.doctor-info {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.doctor-info img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.doctor-info h3 {
+  color: #1f2937;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+}
+
+.doctor-info p {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.consultation-fee {
+  color: #3b82f6 !important;
+  font-weight: 500;
+  margin-top: 0.25rem !important;
+}
+
+.appointment-form {
+  padding: 1.5rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #4b5563;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.input-icon {
+  color: #3b82f6;
+}
+
+.form-group input,
+.form-group select {
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: border-color 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-group input::placeholder {
+  color: #9ca3af;
+}
+
+.form-group select:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+.form-group select option:disabled {
+  color: #9ca3af;
+  background-color: #f3f4f6;
+}
+
+.no-slots-message {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+.form-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.cancel-btn,
+.confirm-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn {
+  background: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+}
+
+.cancel-btn:hover {
+  background: #e5e7eb;
+  color: #1f2937;
+}
+
+.confirm-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+}
+
+.confirm-btn:hover {
+  background: #2563eb;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .appointment-modal {
+    margin: 1rem;
+    max-height: 85vh;
+  }
 }

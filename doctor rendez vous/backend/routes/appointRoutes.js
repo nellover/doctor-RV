@@ -10,6 +10,8 @@ appointRouter.get(
   appointmentController.getallappointments
 );
 
+appointRouter.get("/getbookedslots", appointmentController.getBookedSlots);
+
 appointRouter.post(
   "/bookappointment",
   auth,

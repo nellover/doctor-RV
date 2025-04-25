@@ -91,9 +91,9 @@ td {
   background-color: green;
 }
 
-
 .form-input,
-textarea,select{
+textarea,
+select {
   margin: -1px 4px;
   font-size: 1rem;
   background-color: rgb(234, 234, 234);
@@ -101,73 +101,11 @@ textarea,select{
   border: none;
   border-radius: 5px;
   font-family: var(--font-family);
-  
 }
-.ayx{
+.ayx {
   display: flex;
   justify-self: flex-end;
 }
-.pagination {
-  display: flex;
-  gap: 9px; 
-  justify-content: center; 
-}
-
-.pagination button {
-  padding: 8px 12px;
-  background-color: #e2dddd;
-  border: 1px solid #acabab;
-  cursor: pointer;
-}
-
-.pagination button:hover {
-  background-color: #28d33f;
-}
-
-
-@media (max-width: 1126px) {
-  .user-section {
-    width: 70vw;
-  }
-}
-
-@media (max-width: 875px) {
-  .user-section {
-    width: 65vw;
-  }
-}
-
-@media (max-width: 700px) {
-  .user-section {
-    width: 60vw;
-  }
-}
-
-@media (max-width: 537px) {
-  .user-section {
-    width: 55vw;
-  }
-}
-
-@media (max-width: 426px) {
-  .user-section {
-    width: 50vw;
-  }
-}
-/* styles/user.css */
-.appointments-calendar {
-  display: flex;
-  gap: 2rem;
-}
-
-.calendar-section {
-  width: 50%;
-}
-
-.table-section {
-  width: 50%;
-}
-
 .pagination {
   display: flex;
   gap: 9px;
@@ -183,4 +121,287 @@ textarea,select{
 
 .pagination button:hover {
   background-color: #28d33f;
+}
+
+/* Calendar Styles */
+.appointments-calendar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  padding: 1rem;
+  margin-top: 2rem;
+}
+
+.calendar-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Calendar Event Styles */
+.calendar-event {
+  padding: 4px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.event-time {
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.event-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-status {
+  font-size: 0.75rem;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* Event Status Colors */
+.status-pending {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+  border-left: 3px solid #d97706 !important;
+}
+
+.status-completed {
+  background-color: #dcfce7 !important;
+  color: #166534 !important;
+  border-left: 3px solid #22c55e !important;
+}
+
+.status-cancelled {
+  background-color: #fee2e2 !important;
+  color: #991b1b !important;
+  border-left: 3px solid #ef4444 !important;
+}
+
+/* Event Tooltip */
+.event-tooltip {
+  font-family: var(--font-family);
+}
+
+.event-tooltip h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+  color: #1f2937;
+}
+
+.event-tooltip p {
+  margin: 0.4rem 0;
+  font-size: 0.9rem;
+}
+
+.event-tooltip strong {
+  color: #4b5563;
+}
+
+/* Table Styles */
+.table-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.table-header {
+  margin-bottom: 1rem;
+}
+
+.table-title {
+  font-size: 1.25rem;
+  color: #1f2937;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+/* Pagination Styles */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.pagination button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e5e7eb;
+  background-color: white;
+  color: #4b5563;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination button:hover {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+/* Calendar Customization */
+.fc {
+  font-family: var(--font-family) !important;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1.25rem !important;
+  color: #1f2937;
+}
+
+.fc .fc-button {
+  background: #f3f4f6 !important;
+  border: 1px solid #e5e7eb !important;
+  color: #4b5563 !important;
+  font-weight: 500 !important;
+  text-transform: capitalize !important;
+  padding: 0.5rem 1rem !important;
+  box-shadow: none !important;
+}
+
+.fc .fc-button:hover {
+  background: #e5e7eb !important;
+  border-color: #d1d5db !important;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  background: #3b82f6 !important;
+  border-color: #2563eb !important;
+  color: white !important;
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border-color: #e5e7eb !important;
+}
+
+.fc .fc-day-today {
+  background: #f8fafc !important;
+}
+
+.fc-timegrid-slot,
+.fc-timegrid-axis {
+  height: 3rem !important;
+}
+
+.fc-view-harness {
+  background: white;
+  border-radius: 8px;
+}
+
+.fc-scrollgrid {
+  border-radius: 8px !important;
+}
+
+.fc-col-header {
+  background: #f8fafc;
+}
+
+.fc .fc-toolbar {
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem !important;
+}
+
+/* Now indicator */
+.fc .fc-timegrid-now-indicator-line {
+  border-color: #ef4444 !important;
+}
+
+.fc .fc-timegrid-now-indicator-arrow {
+  border-color: #ef4444 !important;
+  border-width: 5px !important;
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+  .fc .fc-toolbar {
+    justify-content: center;
+  }
+
+  .fc .fc-toolbar-title {
+    font-size: 1.1rem !important;
+  }
+
+  .fc .fc-button {
+    padding: 0.4rem 0.8rem !important;
+    font-size: 0.875rem !important;
+  }
+}
+
+/* Action Buttons */
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.complete-btn,
+.cancel-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.complete-btn {
+  background-color: #22c55e;
+  color: white;
+  border: none;
+}
+
+.complete-btn:hover:not(:disabled) {
+  background-color: #16a34a;
+}
+
+.cancel-btn {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background-color: #dc2626;
+}
+
+.complete-btn:disabled,
+.cancel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Status Badge */
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-badge.status-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.status-completed {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.status-badge.status-cancelled {
+  background-color: #fee2e2;
+  color: #991b1b;
 }

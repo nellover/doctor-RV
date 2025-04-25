@@ -62,7 +62,9 @@ const AdminAppointments = () => {
 
   const cancelAppointment = async (appointmentId) => {
     try {
-      const confirm = window.confirm("Are you sure you want to cancel this appointment?");
+      const confirm = window.confirm(
+        "Are you sure you want to cancel this appointment?"
+      );
       if (confirm) {
         await toast.promise(
           axios.put(
@@ -106,8 +108,6 @@ const AdminAppointments = () => {
                     <th>P Age</th>
                     <th>P Gender</th>
                     <th>P Mobile No.</th>
-                    <th>P bloodGroup</th>
-                    <th>P Family Diseases</th>
                     <th>Appointment Date</th>
                     <th>Appointment Time</th>
                     <th>Booking Date</th>
@@ -121,7 +121,9 @@ const AdminAppointments = () => {
                     <tr key={ele?._id}>
                       <td>{i + 1}</td>
                       <td>
-                        {ele?.doctorId?.firstname + " " + ele?.doctorId?.lastname}
+                        {ele?.doctorId?.firstname +
+                          " " +
+                          ele?.doctorId?.lastname}
                       </td>
                       <td>
                         {ele?.userId?.firstname + " " + ele?.userId?.lastname}
@@ -129,8 +131,6 @@ const AdminAppointments = () => {
                       <td>{ele?.age}</td>
                       <td>{ele?.gender}</td>
                       <td>{ele?.number}</td>
-                      <td>{ele?.bloodGroup}</td>
-                      <td>{ele?.familyDiseases}</td>
                       <td>{ele?.date}</td>
                       <td>{ele?.time}</td>
                       <td>{ele?.createdAt.split("T")[0]}</td>
@@ -148,11 +148,15 @@ const AdminAppointments = () => {
                         </button>
                         <button
                           className={`btn user-btn cancel-btn ${
-                            ele?.status === "Cancelled" || ele?.status === "Completed"
+                            ele?.status === "Cancelled" ||
+                            ele?.status === "Completed"
                               ? "disable-btn"
                               : ""
                           }`}
-                          disabled={ele?.status === "Cancelled" || ele?.status === "Completed"}
+                          disabled={
+                            ele?.status === "Cancelled" ||
+                            ele?.status === "Completed"
+                          }
                           onClick={() => cancelAppointment(ele?._id)}
                         >
                           Cancel
