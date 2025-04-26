@@ -116,6 +116,22 @@ const deletedoctor = async (req, res) => {
   }
 };
 
+const updateDoctor = async (req, res) => {
+  try {
+    const { doctorId, updates } = req.body;
+    const doctor = await Doctor.findByIdAndUpdate(doctorId, updates, {
+      new: true,
+    }).populate("userId");
+    if (!doctor) {
+      return res.status(404).send("Doctor not found");
+    }
+    return res.status(200).send(doctor);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Unable to update doctor");
+  }
+};
+
 module.exports = {
   getalldoctors,
   getnotdoctors,
@@ -123,4 +139,5 @@ module.exports = {
   applyfordoctor,
   acceptdoctor,
   rejectdoctor,
+  updateDoctor,
 };

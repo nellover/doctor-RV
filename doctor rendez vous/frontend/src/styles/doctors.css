@@ -12,6 +12,7 @@
   text-align: center;
   margin-bottom: 2.5rem;
   position: relative;
+  color: #000000;
 }
 
 .page-heading::after {
@@ -24,6 +25,77 @@
   height: 4px;
   background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
   border-radius: 2px;
+}
+
+/* Styles pour les filtres */
+.doctors-filter {
+  margin-bottom: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.search-box {
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1rem;
+  color: #4b5563;
+  background-color: #ffffff;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-input::placeholder {
+  color: #9ca3af;
+}
+
+.specialty-filter {
+  width: 100%;
+}
+
+.specialty-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  padding: 0.5rem;
+}
+
+.specialty-tag {
+  padding: 0.625rem 1.25rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4b5563;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.specialty-tag:hover {
+  background-color: #e5e7eb;
+  transform: translateY(-1px);
+}
+
+.specialty-tag.active {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border-color: transparent;
 }
 
 .doctors-card-container {
@@ -71,12 +143,20 @@
 
   .page-heading {
     margin-bottom: 2rem;
-    font-size: 1.75rem;
   }
 
-  .page-heading::after {
-    width: 60px;
-    height: 3px;
+  .search-input {
+    padding: 0.875rem 1.25rem;
+    font-size: 0.9375rem;
+  }
+
+  .specialty-tags {
+    gap: 0.5rem;
+  }
+
+  .specialty-tag {
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
   }
 }
 
@@ -94,30 +174,47 @@
   .page-heading {
     font-size: 1.5rem;
   }
+
+  .specialty-filter {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.5rem;
+  }
+
+  .specialty-tags {
+    flex-wrap: nowrap;
+    padding: 0.25rem;
+  }
 }
 
-/* Loading State */
-.doctors-loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-}
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .page-heading {
+    color: #f3f4f6;
+  }
 
-/* Empty State */
-.doctors-empty {
-  text-align: center;
-  padding: 3rem 1rem;
-  color: #6b7280;
-}
+  .search-input {
+    background-color: #1f2937;
+    border-color: #374151;
+    color: #f3f4f6;
+  }
 
-.doctors-empty h3 {
-  font-size: 1.5rem;
-  color: #374151;
-  margin-bottom: 1rem;
-}
+  .search-input::placeholder {
+    color: #6b7280;
+  }
 
-.doctors-empty p {
-  max-width: 500px;
-  margin: 0 auto;
+  .search-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  }
+
+  .specialty-tag {
+    background-color: #1f2937;
+    border-color: #374151;
+    color: #e5e7eb;
+  }
+
+  .specialty-tag:hover {
+    background-color: #374151;
+  }
 }

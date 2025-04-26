@@ -14,6 +14,7 @@ const AdminDoctors = () => {
   const [doctors, setDoctors] = useState([]);
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [editingDoctor, setEditingDoctor] = useState(null);
 
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => state.root);
@@ -61,6 +62,44 @@ const AdminDoctors = () => {
     }
   };
 
+  const handleEdit = (doctor) => {
+    setEditingDoctor(doctor);
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      await toast.promise(
+        axios.put(
+          "/doctor/updatedoctor",
+          {
+            doctorId: editingDoctor._id,
+            updates: {
+              specialization: editingDoctor.specialization,
+              experience: editingDoctor.experience,
+              fees: editingDoctor.fees,
+              timing: editingDoctor.timing,
+            },
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        ),
+        {
+          success: "Doctor updated successfully",
+          error: "Unable to update doctor",
+          loading: "Updating doctor...",
+        }
+      );
+      setEditingDoctor(null);
+      getAllDoctors();
+    } catch (error) {
+      return error;
+    }
+  };
+
   useEffect(() => {
     getAllDoctors();
   }, []);
@@ -88,22 +127,16 @@ const AdminDoctors = () => {
         <Loading />
       ) : (
         <section className="user-section">
-          <div className="ayx">
-            <div className="filter">
-              <label htmlFor="filter">Filter by:</label>
+          <div className="user-section-header">
+            <div className="user-section-filters">
               <select
-                id="filter"
+                className="filter-select"
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
               >
                 <option value="all">All</option>
-                <option value="firstname">Name</option>
                 <option value="specialization">Specialization</option>
               </select>
-            </div>
-
-            <div className="search">
-              <label htmlFor="search">Search:</label>
               <input
                 type="text"
                 className="form-input"
@@ -129,41 +162,130 @@ const AdminDoctors = () => {
                     <th>Experience</th>
                     <th>Specialization</th>
                     <th>Fees</th>
-                    <th>Remove</th>
+                    <th>Timing</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredDoctors.map((ele, i) => {
-                    return (
-                      <tr key={ele?._id}>
-                        <td>{i + 1}</td>
-                        <td>
-                          <img
-                            className="user-table-pic"
-                            src={ele?.userId?.pic}
-                            alt={ele?.userId?.firstname}
-                          />
-                        </td>
-                        <td>{ele?.userId?.firstname}</td>
-                        <td>{ele?.userId?.lastname}</td>
-                        <td>{ele?.userId?.email}</td>
-                        <td>{ele?.userId?.mobile}</td>
-                        <td>{ele?.experience}</td>
-                        <td>{ele?.specialization}</td>
-                        <td>{ele?.fees}</td>
-                        <td className="select">
-                          <button
-                            className="btn user-btn"
-                            onClick={() => {
-                              deleteUser(ele?.userId?._id);
-                            }}
-                          >
-                            Remove
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  {filteredDoctors.map((ele, i) => (
+                    <tr key={ele._id}>
+                      {editingDoctor && editingDoctor._id === ele._id ? (
+                        <>
+                          <td>{i + 1}</td>
+                          <td>
+                            <img
+                              className="user-table-pic"
+                              src={ele.userId.pic}
+                              alt={ele.userId.firstname}
+                            />
+                          </td>
+                          <td>{ele.userId.firstname}</td>
+                          <td>{ele.userId.lastname}</td>
+                          <td>{ele.userId.email}</td>
+                          <td>{ele.userId.mobile}</td>
+                          <td>
+                            <input
+                              type="text"
+                              value={editingDoctor.experience}
+                              onChange={(e) =>
+                                setEditingDoctor({
+                                  ...editingDoctor,
+                                  experience: e.target.value,
+                                })
+                              }
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="text"
+                              value={editingDoctor.specialization}
+                              onChange={(e) =>
+                                setEditingDoctor({
+                                  ...editingDoctor,
+                                  specialization: e.target.value,
+                                })
+                              }
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="number"
+                              value={editingDoctor.fees}
+                              onChange={(e) =>
+                                setEditingDoctor({
+                                  ...editingDoctor,
+                                  fees: e.target.value,
+                                })
+                              }
+                            />
+                          </td>
+                          <td>
+                            <select
+                              value={editingDoctor.timing}
+                              onChange={(e) =>
+                                setEditingDoctor({
+                                  ...editingDoctor,
+                                  timing: e.target.value,
+                                })
+                              }
+                            >
+                              <option value="morning">Morning</option>
+                              <option value="afternoon">Afternoon</option>
+                              <option value="evening">Evening</option>
+                              <option value="night">Night</option>
+                            </select>
+                          </td>
+                          <td className="select">
+                            <button
+                              className="btn user-btn accept-btn"
+                              onClick={handleUpdate}
+                            >
+                              Save
+                            </button>
+                            <button
+                              className="btn user-btn cancel-btn"
+                              onClick={() => setEditingDoctor(null)}
+                            >
+                              Cancel
+                            </button>
+                          </td>
+                        </>
+                      ) : (
+                        <>
+                          <td>{i + 1}</td>
+                          <td>
+                            <img
+                              className="user-table-pic"
+                              src={ele.userId.pic}
+                              alt={ele.userId.firstname}
+                            />
+                          </td>
+                          <td>{ele.userId.firstname}</td>
+                          <td>{ele.userId.lastname}</td>
+                          <td>{ele.userId.email}</td>
+                          <td>{ele.userId.mobile}</td>
+                          <td>{ele.experience}</td>
+                          <td>{ele.specialization}</td>
+                          <td>{ele.fees}</td>
+                          <td>{ele.timing}</td>
+                          <td className="select">
+                            <button
+                              className="btn user-btn"
+                              onClick={() => handleEdit(ele)}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              className="btn user-btn"
+                              onClick={() => deleteUser(ele.userId._id)}
+                            >
+                              Remove
+                            </button>
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

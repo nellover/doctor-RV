@@ -19,6 +19,23 @@ const schema = mongoose.Schema(
       type: Number,
       required: true,
     },
+    officePhone: {
+      type: String,
+      required: true,
+    },
+    workingDays: {
+      type: [String],
+      required: true,
+      enum: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ],
+    },
     isDoctor: {
       type: Boolean,
       default: false,

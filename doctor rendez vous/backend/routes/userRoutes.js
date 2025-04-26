@@ -1,26 +1,29 @@
-const express = require("express");
+const { Router } = require("express");
 const auth = require("../middleware/auth");
-const userController = require("../controllers/userController");
-const userRouter = express.Router();
+const {
+  register,
+  login,
+  deleteuser,
+  getallusers,
+  updateprofile,
+  getuser,
+  changepassword,
+  forgotpassword,
+  resetpassword,
+  updateUser,
+} = require("../controllers/userController");
 
-userRouter.get("/getuser/:id", auth, userController.getuser);
+const router = Router();
 
-userRouter.get("/getallusers", auth, userController.getallusers);
+router.get("/getuser/:id", auth, getuser);
+router.get("/getallusers", auth, getallusers);
+router.post("/register", register);
+router.post("/login", login);
+router.put("/updateprofile", auth, updateprofile);
+router.put("/updateuser", auth, updateUser);
+router.put("/changepassword", changepassword);
+router.delete("/deleteuser", auth, deleteuser);
+router.post("/forgotpassword", forgotpassword);
+router.post("/resetpassword/:id/:token", resetpassword);
 
-userRouter.post("/login", userController.login);
-
-userRouter.post("/register", userController.register);
-
-userRouter.post("/forgotpassword", userController.forgotpassword);
-
-userRouter.post("/resetpassword/:id/:token", userController.resetpassword);
-
-userRouter.put("/updateprofile", auth, userController.updateprofile);
-
-userRouter.put("/changepassword", auth, userController.changepassword);
-
-
-userRouter.delete("/deleteuser", auth, userController.deleteuser);
-
-
-module.exports = userRouter;
+module.exports = router;

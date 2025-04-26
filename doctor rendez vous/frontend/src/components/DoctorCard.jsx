@@ -3,15 +3,15 @@ import React, { useState } from "react";
 import BookAppointment from "../components/BookAppointment";
 import { toast } from "react-hot-toast";
 import {
-  FaUserMd,
   FaPhone,
   FaMoneyBillWave,
   FaBriefcase,
+  FaCalendar,
 } from "react-icons/fa";
 
 const DoctorCard = ({ ele }) => {
   const [modalOpen, setModalOpen] = useState(false);
-  const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const token = localStorage.getItem("token") || "";
 
   const handleModal = () => {
     if (token === "") {
@@ -33,11 +33,7 @@ const DoctorCard = ({ ele }) => {
           />
         </div>
         <div className="doctor-card__status">
-          {ele?.status === "approved" ? (
-            <span className="status-badge available">Available</span>
-          ) : (
-            <span className="status-badge unavailable">Unavailable</span>
-          )}
+          <span className="status-badge available">Available</span>
         </div>
       </div>
 
@@ -70,8 +66,16 @@ const DoctorCard = ({ ele }) => {
           <div className="info-item">
             <FaPhone className="info-icon" />
             <div className="info-text">
-              <span className="info-label">Phone</span>
-              <span className="info-value">{ele?.userId?.mobile}</span>
+              <span className="info-label">Office Phone</span>
+              <span className="info-value">{ele?.officePhone}</span>
+            </div>
+          </div>
+
+          <div className="info-item full-width">
+            <FaCalendar className="info-icon" />
+            <div className="info-text">
+              <span className="info-label">Working Days</span>
+              <span className="info-value">{ele?.workingDays?.join(", ")}</span>
             </div>
           </div>
         </div>

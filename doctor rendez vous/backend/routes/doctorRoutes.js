@@ -1,19 +1,23 @@
-const express = require("express");
-const doctorController = require("../controllers/doctorController");
+const { Router } = require("express");
 const auth = require("../middleware/auth");
+const {
+  getalldoctors,
+  getnotdoctors,
+  deletedoctor,
+  applyfordoctor,
+  acceptdoctor,
+  rejectdoctor,
+  updateDoctor,
+} = require("../controllers/doctorController");
 
-const doctorRouter = express.Router();
+const router = Router();
 
-doctorRouter.get("/getalldoctors", doctorController.getalldoctors);
+router.get("/getalldoctors", auth, getalldoctors);
+router.get("/getnotdoctors", auth, getnotdoctors);
+router.post("/applyfordoctor", auth, applyfordoctor);
+router.put("/deletedoctor", auth, deletedoctor);
+router.put("/acceptdoctor", auth, acceptdoctor);
+router.put("/rejectdoctor", auth, rejectdoctor);
+router.put("/updatedoctor", auth, updateDoctor);
 
-doctorRouter.get("/getnotdoctors", auth, doctorController.getnotdoctors);
-
-doctorRouter.post("/applyfordoctor", auth, doctorController.applyfordoctor);
-
-doctorRouter.put("/deletedoctor", auth, doctorController.deletedoctor);
-
-doctorRouter.put("/acceptdoctor", auth, doctorController.acceptdoctor);
-
-doctorRouter.put("/rejectdoctor", auth, doctorController.rejectdoctor);
-
-module.exports = doctorRouter;
+module.exports = router;

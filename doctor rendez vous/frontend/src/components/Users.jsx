@@ -15,6 +15,47 @@ const Users = () => {
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const { loading } = useSelector((state) => state.root);
+  const [editingUser, setEditingUser] = useState(null);
+
+  const handleEdit = (user) => {
+    setEditingUser(user);
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      await toast.promise(
+        axios.put(
+          "/user/updateuser",
+          {
+            userId: editingUser._id,
+            updates: {
+              firstname: editingUser.firstname,
+              lastname: editingUser.lastname,
+              email: editingUser.email,
+              mobile: editingUser.mobile,
+              age: editingUser.age,
+              gender: editingUser.gender,
+            },
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        ),
+        {
+          success: "User updated successfully",
+          error: "Unable to update user",
+          loading: "Updating user...",
+        }
+      );
+      setEditingUser(null);
+      getAllUsers();
+    } catch (error) {
+      return error;
+    }
+  };
 
   const getAllUsers = async () => {
     try {
@@ -77,32 +118,6 @@ const Users = () => {
         <Loading />
       ) : (
         <section className="user-section">
-          <div className="ayx">
-            <div className="filter">
-              <label htmlFor="filter">Filter by:</label>
-              <select
-                id="filter"
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-              >
-                <option value="all">All</option>
-                <option value="firstname">Name</option>
-
-              </select>
-            </div>
-
-            <div className="search">
-              <label htmlFor="search">Search:</label>
-              <input
-                type="text"
-                className="form-input"
-                id="search"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search"
-              />
-            </div>
-          </div>
           <h3 className="home-sub-heading">All Users</h3>
           {users.length > 0 ? (
             <div className="user-container">
@@ -118,35 +133,146 @@ const Users = () => {
                     <th>Age</th>
                     <th>Gender</th>
                     <th>Is Doctor</th>
-                    <th>Remove</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUsers.map((ele, i) => (
+                  {users.map((ele, i) => (
                     <tr key={ele._id}>
-                      <td>{i + 1}</td>
-                      <td>
-                        <img
-                          className="user-table-pic"
-                          src={ele.pic}
-                          alt={ele.firstname}
-                        />
-                      </td>
-                      <td>{ele.firstname}</td>
-                      <td>{ele.lastname}</td>
-                      <td>{ele.email}</td>
-                      <td>{ele.mobile}</td>
-                      <td>{ele.age}</td>
-                      <td>{ele.gender}</td>
-                      <td>{ele.isDoctor ? "Yes" : "No"}</td>
-                      <td className="select">
-                        <button
-                          className="btn user-btn"
-                          onClick={() => deleteUser(ele._id)}
-                        >
-                          Remove
-                        </button>
-                      </td>
+                      {editingUser && editingUser._id === ele._id ? (
+                        <>
+                          <td>{i + 1}</td>
+                          <td>
+                            <img
+                              className="user-table-pic"
+                              src={ele.pic}
+                              alt={ele.firstname}
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="text"
+                              value={editingUser.firstname}
+                              onChange={(e) =>
+                                setEditingUser({
+                                  ...editingUser,
+                                  firstname: e.target.value,
+                                })
+                              }
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="text"
+                              value={editingUser.lastname}
+                              onChange={(e) =>
+                                setEditingUser({
+                                  ...editingUser,
+                                  lastname: e.target.value,
+                                })
+                              }
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="email"
+                              value={editingUser.email}
+                              onChange={(e) =>
+                                setEditingUser({
+                                  ...editingUser,
+                                  email: e.target.value,
+                                })
+                              }
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="text"
+                              value={editingUser.mobile}
+                              onChange={(e) =>
+                                setEditingUser({
+                                  ...editingUser,
+                                  mobile: e.target.value,
+                                })
+                              }
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="number"
+                              value={editingUser.age}
+                              onChange={(e) =>
+                                setEditingUser({
+                                  ...editingUser,
+                                  age: e.target.value,
+                                })
+                              }
+                            />
+                          </td>
+                          <td>
+                            <select
+                              value={editingUser.gender}
+                              onChange={(e) =>
+                                setEditingUser({
+                                  ...editingUser,
+                                  gender: e.target.value,
+                                })
+                              }
+                            >
+                              <option value="male">Male</option>
+                              <option value="female">Female</option>
+                              <option value="other">Other</option>
+                            </select>
+                          </td>
+                          <td>{ele.isDoctor ? "Yes" : "No"}</td>
+                          <td className="select">
+                            <button
+                              className="btn user-btn accept-btn"
+                              onClick={handleUpdate}
+                            >
+                              Save
+                            </button>
+                            <button
+                              className="btn user-btn cancel-btn"
+                              onClick={() => setEditingUser(null)}
+                            >
+                              Cancel
+                            </button>
+                          </td>
+                        </>
+                      ) : (
+                        <>
+                          <td>{i + 1}</td>
+                          <td>
+                            <img
+                              className="user-table-pic"
+                              src={ele.pic}
+                              alt={ele.firstname}
+                            />
+                          </td>
+                          <td>{ele.firstname}</td>
+                          <td>{ele.lastname}</td>
+                          <td>{ele.email}</td>
+                          <td>{ele.mobile}</td>
+                          <td>{ele.age}</td>
+                          <td>{ele.gender}</td>
+                          <td>{ele.isDoctor ? "Yes" : "No"}</td>
+                          <td className="select">
+                            <button
+                              className="btn user-btn"
+                              onClick={() => handleEdit(ele)}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              className="btn user-btn"
+                              onClick={() => deleteUser(ele._id)}
+                            >
+                              Remove
+                            </button>
+                          </td>
+                        </>
+                      )}
                     </tr>
                   ))}
                 </tbody>

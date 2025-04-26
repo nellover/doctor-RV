@@ -14,10 +14,37 @@ const ApplyDoctor = () => {
     specialization: "",
     experience: "",
     fees: "",
+    officePhone: "",
+    workingDays: [],
   });
+
+  const weekDays = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
 
   const inputChange = (e) => {
     const { name, value } = e.target;
+    if (name === "workingDays") {
+      const days = [...formDetails.workingDays];
+      if (e.target.checked) {
+        days.push(value);
+      } else {
+        const index = days.indexOf(value);
+        if (index > -1) {
+          days.splice(index, 1);
+        }
+      }
+      return setFormDetails({
+        ...formDetails,
+        workingDays: days,
+      });
+    }
     return setFormDetails({
       ...formDetails,
       [name]: value,
@@ -27,6 +54,12 @@ const ApplyDoctor = () => {
   const btnClick = async (e) => {
     e.preventDefault();
     try {
+      if (!formDetails.workingDays.length) {
+        return toast.error("Please select at least one working day");
+      }
+      if (!formDetails.officePhone) {
+        return toast.error("Please enter office phone number");
+      }
       await toast.promise(
         axios.post(
           "/doctor/applyfordoctor",
@@ -61,7 +94,7 @@ const ApplyDoctor = () => {
       >
         <div className="register-container flex-center contact">
           <h2 className="form-heading">Apply for Doctor</h2>
-          <form className="register-form ">
+          <form className="register-form">
             <input
               type="text"
               name="specialization"
@@ -82,15 +115,38 @@ const ApplyDoctor = () => {
               type="number"
               name="fees"
               className="form-input"
-              placeholder="Enter your fees  (in dollars)"
+              placeholder="Enter your fees (in dollars)"
               value={formDetails.fees}
               onChange={inputChange}
             />
-            <button
-              type="submit"
-              className="btn form-btn"
-              onClick={btnClick}
-            >
+            <input
+              type="tel"
+              name="officePhone"
+              className="form-input"
+              placeholder="Enter office phone number"
+              value={formDetails.officePhone}
+              onChange={inputChange}
+              pattern="[0-9]{8,}"
+              title="Please enter a valid phone number (minimum 8 digits)"
+            />
+            <div className="working-days-container">
+              <p className="working-days-title">Select Working Days:</p>
+              <div className="working-days-checkboxes">
+                {weekDays.map((day) => (
+                  <label key={day} className="day-checkbox">
+                    <input
+                      type="checkbox"
+                      name="workingDays"
+                      value={day}
+                      checked={formDetails.workingDays.includes(day)}
+                      onChange={inputChange}
+                    />
+                    {day}
+                  </label>
+                ))}
+              </div>
+            </div>
+            <button type="submit" className="btn form-btn" onClick={btnClick}>
               apply
             </button>
           </form>

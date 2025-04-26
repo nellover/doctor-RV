@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { IoMdClose } from "react-icons/io";
 import {
   FaCalendarAlt,
@@ -15,40 +15,57 @@ const BookAppointment = ({ setModalOpen, ele }) => {
   const [formDetails, setFormDetails] = useState({
     date: "",
     time: "",
-    age: "",
-    gender: "",
+    doctorId: "",
+    userId: "",
+    description: "",
     number: "",
   });
   const [bookedSlots, setBookedSlots] = useState([]);
 
+  const fetchBookedSlots = useCallback(
+    async (selectedDate) => {
+      try {
+        const response = await axios.get("/appointment/getbookedslots", {
+          params: {
+            doctorId: ele?.userId?._id,
+            date: selectedDate,
+          },
+        });
+        setBookedSlots(response.data);
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération des créneaux réservés:",
+          error
+        );
+      }
+    },
+    [ele?.userId?._id]
+  );
+
+  const isWorkingDay = (date) => {
+    const dayOfWeek = new Date(date).toLocaleString("en-US", {
+      weekday: "long",
+    });
+    return ele?.workingDays?.includes(dayOfWeek);
+  };
+
   const inputChange = (e) => {
     const { name, value } = e.target;
+
+    // Reset time if date changes
+    if (name === "date" && !isWorkingDay(value)) {
+      toast.error("Doctor is not available on this day");
+      return setFormDetails({
+        ...formDetails,
+        date: value,
+        time: "",
+      });
+    }
+
     setFormDetails({
       ...formDetails,
       [name]: value,
     });
-
-    // Si la date change, récupérer les créneaux réservés
-    if (name === "date") {
-      fetchBookedSlots(value);
-    }
-  };
-
-  const fetchBookedSlots = async (selectedDate) => {
-    try {
-      const response = await axios.get("/appointment/getbookedslots", {
-        params: {
-          doctorId: ele?.userId?._id,
-          date: selectedDate,
-        },
-      });
-      setBookedSlots(response.data);
-    } catch (error) {
-      console.error(
-        "Erreur lors de la récupération des créneaux réservés:",
-        error
-      );
-    }
   };
 
   const bookAppointment = async (e) => {
@@ -109,6 +126,12 @@ const BookAppointment = ({ setModalOpen, ele }) => {
     setFormDetails((prev) => ({ ...prev, time: "" }));
   }, [bookedSlots]);
 
+  useEffect(() => {
+    if (formDetails.date) {
+      fetchBookedSlots(formDetails.date);
+    }
+  }, [formDetails.date, fetchBookedSlots]);
+
   return (
     <div className="modal-overlay">
       <div className="appointment-modal">
@@ -151,6 +174,11 @@ const BookAppointment = ({ setModalOpen, ele }) => {
                 min={new Date().toISOString().split("T")[0]}
                 required
               />
+              {formDetails.date && !isWorkingDay(formDetails.date) && (
+                <p className="error-text">
+                  Doctor is not available on this day
+                </p>
+              )}
             </div>
 
             <div className="form-group">
@@ -163,7 +191,7 @@ const BookAppointment = ({ setModalOpen, ele }) => {
                 value={formDetails.time}
                 onChange={inputChange}
                 required
-                disabled={!formDetails.date}
+                disabled={!formDetails.date || !isWorkingDay(formDetails.date)}
               >
                 <option value="">Select Time</option>
                 {generateTimeOptions().map((time) => (
@@ -172,11 +200,6 @@ const BookAppointment = ({ setModalOpen, ele }) => {
                   </option>
                 ))}
               </select>
-              {formDetails.date && generateTimeOptions().length === 0 && (
-                <p className="no-slots-message">
-                  No available time slots for this date
-                </p>
-              )}
             </div>
 
             <div className="form-group">
