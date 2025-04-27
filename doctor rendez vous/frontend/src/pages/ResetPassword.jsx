@@ -23,17 +23,23 @@ function ResetPassword() {
     }
 
     try {
-      const response = await axios.post(`/user/resetpassword/${id}/${token}`, { password });
+      const response = await axios.post(
+        `/api/user/resetpassword/${id}/${token}`,
+        { password }
+      );
 
       if (response.status === 200) {
         toast.success("Password reset successfully");
-        navigate('/login');
+        navigate("/login");
       } else {
         toast.error("Failed to reset password. Please try again.");
       }
     } catch (error) {
       console.error("Error resetting password:", error);
-      toast.error("Failed to reset password. Please try again.");
+      toast.error(
+        error.response?.data?.error ||
+          "Failed to reset password. Please try again."
+      );
     }
   };
 
@@ -41,7 +47,7 @@ function ResetPassword() {
     <>
       <Navbar />
       <section className="register-section flex-center">
-      <div className="register-container flex-center">
+        <div className="register-container flex-center">
           <h2 className="form-heading">Reset Password</h2>
           <form onSubmit={handleFormSubmit} className="register-form">
             <input

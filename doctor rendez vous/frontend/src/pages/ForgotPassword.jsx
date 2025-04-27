@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom"; 
+import { NavLink, useNavigate } from "react-router-dom";
 import "../styles/register.css";
 import Navbar from "../components/Navbar";
 import axios from "axios";
@@ -11,7 +11,7 @@ function ForgotPassword() {
   const [formDetails, setFormDetails] = useState({
     email: "",
   });
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const inputChange = (e) => {
     const { name, value } = e.target;
@@ -32,13 +32,16 @@ function ForgotPassword() {
     try {
       const response = await axios.post("/user/forgotpassword", { email });
       if (response.status === 200) {
-        toast.success("Password reset email sent successfully!!!!!");
-        navigate('/login'); 
+        toast.success("Password reset email sent successfully!");
+        navigate("/login");
       } else {
         toast.error("Failed to send password reset email");
       }
     } catch (error) {
       console.error("Error sending password reset email:", error);
+      toast.error(
+        error.response?.data?.status || "Failed to send password reset email"
+      );
     }
   };
 
